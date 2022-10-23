@@ -82,16 +82,14 @@ class AzureBlobFileDownloader(object):
          if filename == row[0]:
           engine.execute("TRUNCATE TABLE " + schema_name + "." + row[0])
           print('TRUNCATE TABLE lab.' +  row[0])
-          with tqdm(range(len(row[0]))) as pbar:
-           for df in pd.read_csv(full_path, encoding='utf-8', iterator = True, chunksize=1000, escapechar='\\'):
-            chunksize = int(len(row[0]) / 10)
-            df.to_sql(row[0], engine, if_exists='append', index=False, schema=schema_name)
-           pbar.update(chunksize)
+          for df in tqdm(pd.read_csv(full_path, encoding='utf-8', iterator = True, chunksize=1000, escapechar='\\'), total=len(row[0])):
+           df.to_sql(row[0], engine, if_exists='append', index=False, schema=schema_name)
+           time.sleep(0.0000001)
           print('Die Tabelle ' + row[0] + ' wurde befüllt')
           #os.remove(os.path.join(directory, file))
           #print('Die Datei ' + file + ' wurde gelöscht')
    
-
+a
 # Initialize class and upload files
 azure_blob_file_downloader = AzureBlobFileDownloader()
 azure_blob_file_downloader.csv_to_postgres()
